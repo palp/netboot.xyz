@@ -7,17 +7,18 @@ generate_checksums: true
 generate_local_vars: true
 
 # set desired site name
-#site_name: mysitename.com
+site_name: palp.la
 
 # set desired boot domain
-#boot_domain: boot.mysitename.com
+boot_domain: boot.palp.la
 
 # set boot version
 #boot_version: "2.x"
 
-#bootloader_tftp_enabled: false
-#bootloader_https_enabled: true
-#bootloader_http_enabled: true
+bootloader_tftp_enabled: true
+bootloader_https_enabled: true
+bootloader_http_enabled: true
+generate_disks_hybrid: true
 
 # set release overrides from standard netboot.xyz defaults
 #release_overrides:
