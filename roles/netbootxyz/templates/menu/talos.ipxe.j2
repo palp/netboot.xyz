@@ -11,15 +11,17 @@ set os {{ releases.talos.name }}
 isset ${talos_version} || set talos_version latest
 isset ${talos_mirror} || set talos_mirror {{ releases.talos.mirror }}
 isset ${talos_platform} || set talos_platform metal
+isset ${talos_arch} || set talos_arch amd64
 menu ${os} by Talos Systems
 menu ${os} install
 item --gap Talos:
 item talos_boot ${space} Begin install ${os} ${talos_version}
 item --gap Parameters:
 item talos_version ${space} ${os} version: ${talos_version}
-item talos_config_url ${space} Set userdata.yaml URL: ${talos_config_url}
+item talos_config_url ${space} Set config.yaml URL: ${talos_config_url}
 item talos_mirror ${space} Set mirror URL: ${talos_mirror}
 item talos_platform ${space} Set platform: ${talos_platform}
+item talos_arch ${space} Set arch: ${talos_arch}
 choose --default ${menu} menu || goto talos_exit
 echo ${cls}
 goto ${menu} ||
@@ -52,7 +54,7 @@ clear menu
 goto talos
 
 :talos_config_url
-echo -n Set userdata.yaml URL:  && read talos_config_url
+echo -n Set config.yaml URL:  && read talos_config_url
 clear menu
 goto talos
 
@@ -64,19 +66,25 @@ item {{ item.key }} ${space} {{ item.name }}
 choose --default ${talos_platform} talos_platform
 goto talos
 
+:talos_arch
+menu ${os} arch
+item amd64 ${space} amd64
+item arm ${space} arm
+choose --default ${talos_arch} talos_arch
+
 :talos_boot
 isset ${talos_base_url} || set talos_base_url ${talos_mirror}/latest/download
 isset ${talos_config_url} && set talos_config talos.config=${talos_config_url} ||
 set boot_params page_poison=1 printk.devkmsg=on slab_nomerge slub_debug=P pti=on talos.platform=${talos_platform} ${talos_config} {{ kernel_params }}
 imgfree
-kernel ${talos_base_url}/vmlinuz ${boot_params}
-initrd ${talos_base_url}/initramfs.xz
+kernel ${talos_base_url}/vmlinuz-${talos_arch} ${boot_params}
+initrd ${talos_base_url}/initramfs-${talos_arch}.xz
 echo
 echo Booting with the following kernel args:
 echo ${boot_params}
 echo
 echo MD5sums:
-md5sum vmlinuz initramfs.xz
+md5sum vmlinuz initramfs-${talos_arch}.xz
 boot
 
 :talos_exit
